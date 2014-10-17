@@ -1,22 +1,22 @@
-swift_url=http://9.110.51.245:8080/auth/v1.0
-swift_user=system:root
-swift_pass=testpass
 cloud_no=0
-cloud_domain=cloud.com
+cloud_domain=gemini.cdl.ibm.com
 cache_dir=/opt/cloudland/cache
+cache_tmp_dir=$cache_dir/tmp
 volume_dir=/opt/cloudland/volume
 image_dir=/var/lib/libvirt/images
 xml_dir=/opt/cloudland/xml
 db_file=/opt/cloudland/db/cloudland.db
 dmasq_dir=/opt/cloudland/dnsmasq
-dns_server=9.0.148.50
-vxlan_mcast_addr=239.1.1.1
-vxlan_interface=br4090
-vlan_interface=eth3
+dns_server=9.115.78.212
+vxlan_mcast_addr=239.1.1.10
+vxlan_interface=eth0
+vlan_interface=eth0
 cpu_limit=10
 mem_limit=32768
 vol_limit=100
 disk_inc_limit=100
+mudata_dir=/opt/cloudland/mudata
+snapshot_dir=/var/snapshot
 
 function die()
 {
@@ -39,4 +39,3 @@ function inet_ntoa()
         printf '%hu.' "0x${i}"
     done | sed "s/\.$//g"
 }
-

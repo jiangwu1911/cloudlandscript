@@ -30,7 +30,7 @@ if [ ! -f "$vm_img" ]; then
     qemu-img convert -f qcow2 -O raw $cache_dir/$img_name $vm_img
 fi
 
-[ -n "$disk_inc" ] && disk_inc=${disk_inc%%[G|g]}
+[ -n "$disk_inc" ] && disk_inc=${disk_inc%%[G|g]} &&
 [ $disk_inc -gt 0 -a $disk_inc -le $disk_inc_limit ] && qemu-img resize $vm_img +${disk_inc}G
 vsize=`qemu-img info $vm_img | grep 'virtual size:' | cut -d' ' -f3`
 vm_br=br$vlan
@@ -62,5 +62,6 @@ if [ $? -eq 0 ]; then
     vm_stat=running
     vnc_port=`cat $vm_xml | grep "graphics type='vnc'" | sed "s/.*port='\([0-9]*\)' .*/\1/"` 
     vm_vnc="$vnc_port:$vnc_pass"
+    bridge fdb replace $vm_mac dev vxlan-$vlan dst 127.0.0.1
 fi
 echo "|:-COMMAND-:| /opt/cloudland/scripts/frontback/`basename $0` '$vm_ID' '$vm_stat' `hostname -s` '$vm_mac' '$vm_vnc' '$vsize' '$is_vol'"

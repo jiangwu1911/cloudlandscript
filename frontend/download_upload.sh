@@ -16,6 +16,7 @@ file=$cache_dir/`basename $url`
 /usr/bin/wget -q $url -O $file
 [ -f "$file" ] || die "Failed to download file!"
 
+sync
 size=`ls -l $file | cut -d' ' -f 5`
 if [ $size -eq 0 ]; then
     rm -f $file

@@ -8,10 +8,5 @@ source ../cloudrc
 owner=$1
 img_file=$2
 
-num=`sqlite3 $db_file "select count(*) from image where name='$img_file' and owner='$owner'"`
-[ $num -ge 1 ] || die "No such image!"
-
-sqlite3 $db_file "delete from image where name='$img_file'"
-rm -f $cache_dir/$img_file
-swift -A $swift_url -U $swift_user -K $swift_pass delete images $img_file >/dev/null 2>&1
-[ $? -eq 0 ] && echo "$img_file|deleted"
+/opt/cloudland/bin/sendmsg "exec" "/opt/cloudland/scripts/frontend/delete_file.sh '$owner' '$img_file'"
+echo "$img_file|deleting"

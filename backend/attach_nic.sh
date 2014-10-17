@@ -20,3 +20,4 @@ if [ ! -d /sys/devices/virtual/net/$vm_br ]; then
 fi
 virsh attach-interface $vm_ID bridge $vm_br --model virtio --mac $vm_mac
 [ $? -eq 0 ] && echo "NIC $vm_mac in vlan $vlan was attached successfully to $vm_ID."
+virsh dumpxml $vm_ID > $xml_dir/$vm_ID.xml

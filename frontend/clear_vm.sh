@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd `dirname $0`
-source ../cloudrc
+source /opt/cloudland/scripts/cloudrc
 
 [ $# -lt 2 ] && echo "$0 <user> <vm_ID>" && exit -1
 

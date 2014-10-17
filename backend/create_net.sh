@@ -43,7 +43,7 @@ if [ $? -eq 0 ]; then
 else
     echo "tag:tag$vlan-$tag_id,option:router" >> $dns_opt
 fi
-[ -n "$dns_server" ] && echo "tag:tag$vlan,option:dns-server,$dns_server" >> $dns_opt
+[ -n "$dns_server" ] && echo "tag:tag$vlan-$tag_id,option:dns-server,$dns_server" >> $dns_opt
 dmasq_cmd=`ps -ef | grep dnsmasq | grep "\<interface=ns-$vlan\>" | awk '{print $2}'`
 dns_pid=`echo "$dmasq_cmd" | awk '{print $2}'`
 if [ -z "$dns_pid" ]; then

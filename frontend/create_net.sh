@@ -3,7 +3,7 @@
 cd `dirname $0`
 source ../cloudrc
 
-[ $# -lt 2 ] && echo "$0 <user> <vlan> <network> [netmask] [gateway] [start_ip] [end_ip] [hyper]" && exit -1
+[ $# -lt 2 ] && echo "$0 <user> <vlan> <network> [netmask] [gateway] [start_ip] [end_ip]" && exit -1
 
 owner=$1
 vlan=$2
@@ -12,7 +12,6 @@ netmask=$4
 gateway=$5
 start_ip=$6
 end_ip=$7
-hyper=$8
 has_gw='false'
 
 [ "$vlan" -ge 4095 -o "$owner" == "admin" ] || die "Vlan number must be >= 4095"
@@ -63,20 +62,20 @@ fi
 
 sqlite3 $db_file "insert into network (vlan, network, netmask, gateway, start_address, end_address) values ($vlan, '$network', '$netmask', '$gateway', '$start_ip', '$end_ip')" 
 if [ "$has_gw" == 'true' ]; then
-    sqlite3 $db_file "insert into address (IP, allocated, vlan) values ('$gateway', 'true', '$vlan')"
+    sqlite3 $db_file "insert into address (IP, allocated, vlan, network) values ('$gateway', 'true', '$vlan', '$network')"
 fi
 if [ -n "$network" ]; then
-    [ "$start_ip" != "$gateway" ] && sqlite3 $db_file "insert into address (IP, allocated, vlan) values ('$start_ip', 'true', '$vlan')"
+    [ "$start_ip" != "$gateway" ] && sqlite3 $db_file "insert into address (IP, allocated, vlan, network) values ('$start_ip', 'true', '$vlan', '$network')"
 
     ip=`inet_aton $start_ip`
     end=`inet_aton $end_ip`
     while [ $ip -lt $end ]; do
         let ip=$ip+1
-        sqlite3 $db_file "insert into address (IP, allocated, vlan) values ('`inet_ntoa $ip`', 'false', '$vlan')"
+        sqlite3 $db_file "insert into address (IP, allocated, vlan, network) values ('`inet_ntoa $ip`', 'false', '$vlan', '$network')"
     done
 fi
 
 tag_id=`sqlite3 $db_file "select id from network where vlan='$vlan' and network='$network'"`
-[ -n "$hyper" ] && hyper_id=`sqlite3 $db_file "select id from compute where hyper_name='$hyper'"`
+hyper_id=`sqlite3 $db_file "select id from compute where hyper_name=(select router from netlink where vlan='$vlan')"`
 /opt/cloudland/bin/sendmsg "inter $hyper_id" "/opt/cloudland/scripts/backend/`basename $0` $vlan $network $netmask $gateway $start_ip $end_ip $tag_id"
 echo "$network|created"

@@ -3,7 +3,7 @@
 cd `dirname $0`
 source ../cloudrc
 
-[ $# -lt 4 ] && echo "$0 <user> <image> <vlan> <mac> [name] [ip] [cpu] [memory(m)] [disk_inc(G)] [hyper]" && exit -1
+[ $# -lt 4 ] && echo "$0 <user> <image> <vlan> <mac> [name] [ip] [cpu] [memory(m)] [disk_inc(G)] [hyper] [metadata]" && exit -1
 
 owner=$1
 img_name=$2
@@ -15,6 +15,7 @@ vm_cpu=$7
 vm_mem=$8
 disk_inc=$9
 hyper=${10}
+metadata=${11}
 vm_ID=`date +%m%d%H%M%S-%N`
 vm_mem=${vm_mem%[m|M]}
 
@@ -34,7 +35,7 @@ fi
 num=`sqlite3 $db_file "select count(*) from instance where owner='$owner' and status!='deleted'"`
 quota=`sqlite3 $db_file "select inst_limit from quota where role=(select role from users where username='$owner')"`
 [ $quota -ge 0 -a $num -ge $quota ] && die "Quota is used up!"
-num=`sqlite3 $db_file "select count(*) from network where vlan='$vlan' and (owner='$owner' or shared='true' COLLATE NOCASE)"`
+num=`sqlite3 $db_file "select count(*) from netlink where vlan='$vlan' and (owner='$owner' or shared='true' COLLATE NOCASE)"`
 [ $num -lt 1 ] && die "Not authorised to launch vm on vlan $vlan!"
 
 if [ -n "$vm_ip" ]; then

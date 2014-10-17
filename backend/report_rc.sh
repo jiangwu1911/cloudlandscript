@@ -29,7 +29,7 @@ function current_RXTX()
     res1=`cat /proc/net/dev | grep "$vxlan_interface:" | cut -d: -f2-`
     sleep $interval
     res2=`cat /proc/net/dev | grep "$vxlan_interface:" | cut -d: -f2-`
-    echo $res1 $res2 | awk '{print ($17 - $1) * 8 / "'$interval'", ($25 - $9) * 8 / "'$interval'"}'
+    echo $res1 $res2 | awk '{printf "%d %d\n", ($17 - $1) * 8 / "'$interval'", ($25 - $9) * 8 / "'$interval'"}'
 }
 
 while true; do

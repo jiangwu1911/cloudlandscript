@@ -10,7 +10,7 @@ vm_ID=$2
 vlan=$3
 vm_ip=$4
 
-num=`sqlite3 $db_file "select count(vlan) from network where vlan='$vlan' and (owner='$owner' or shared='true' COLLATE NOCASE)"`
+num=`sqlite3 $db_file "select count(vlan) from netlink where vlan='$vlan' and (owner='$owner' or shared='true' COLLATE NOCASE)"`
 [ $num -lt 1 ] && die "No vlan $vlan belonging to $owner!"
 num=`sqlite3 $db_file "select count(*) from instance where inst_id='$vm_ID' and owner='$owner' and status='running'"`
 [ $num -lt 1 ] && die "VM not running or not VM owner!"
@@ -29,5 +29,5 @@ router=`sqlite3 $db_file "select id from compute where hyper_name=(select router
 [ "$router" -ge 0 ] && /opt/cloudland/bin/sendmsg "inter $router" "/opt/cloudland/scripts/backend/set_host.sh $vlan $vm_mac $vm_name $vm_ip"
 hyper_id=`sqlite3 $db_file "select id from compute where hyper_name=(select hyper_name from instance where inst_id='$vm_ID')"`
 [ -n "$hyper_id" ] && /opt/cloudland/bin/sendmsg "inter $hyper_id" "/opt/cloudland/scripts/backend/`basename $0` $vm_ID $vlan $vm_ip $vm_mac"
-sqlite3 $db_file "update volume set inst_id='$vm_ID', device='', instance='$vm_ID' where IP='$vm_ip'"
+#sqlite3 $db_file "update volume set inst_id='$vm_ID', device='', instance='$vm_ID' where IP='$vm_ip'"
 echo "$vm_ID|$vlan|attaching"
